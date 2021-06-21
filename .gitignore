@@ -1,0 +1,14 @@
+# ignore all files and directories
+/*
+/*/
+
+# except
+!.gitignore
+!README.md
+!read_info.csv
+
+!workflow/
+!workflow/*
+!analysis/
+!analysis/*
+

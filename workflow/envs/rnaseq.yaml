@@ -1,0 +1,18 @@
+name: rnaseq
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - bcftools=1.12
+  - star=2.7.9a
+  - gffread=0.12.1
+  - salmon=1.5.0
+  - rseqc=4.0.0
+  - cutadapt=3.4
+  - fastqc=0.11.9
+  - sortmerna=4.3.2
+  - multiqc=1.10.1
+  - samtools=1.12
+  - picard=2.25.5
+  - gffutils=0.10.1
+  - seqtk=1.3

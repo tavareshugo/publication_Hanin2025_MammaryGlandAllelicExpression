@@ -1,0 +1,58 @@
+# path to sample information sheet in CSV format
+# Needs to contain columns named: 
+# id           (unique identifier for a sequencing sample)
+# sample       (identifier for a biological sample; samples with the same name will be merged together)
+# library      (identifier for the library; samples with the same library ID are de-duplicated together)
+# fq1          (path to read 1 FastQ file - can be compressed)
+# fq2          (path to read 2 FastQ file - can be compressed)
+# strandedness (values allowed: 'none', 'yes', 'reverse'; if empty will assume 'none')
+samples: read_info_batch02.csv # read_info_test.csv
+# Note about strandedness:
+# 'none' is for unstranded protocols
+# 'yes' and 'reverse' follow the nomenclature used in `htseq-count --reverse` 
+# see STAR manual section 7, "Counting number of reads per gene"
+
+# choose steps of the workflow you may want to skip (note that some QC metrics will not be available if you skip these)
+skip:
+  trimming: false
+  alignment: false
+
+reference:
+  # fasta file with reference genome (can be compressed)
+  genome: "data/external/reference/genome.fa.gz"
+  # gtf file with transcripts (can be compressed)
+  annotation: "data/external/reference/annotation.gtf.gz"
+  
+variants: 
+  vcf: "data/external/strains/B6xCAST.snps_and_indels.vcf.gz"
+  sample: "B6xCAST"     # sample in the VCF file from where variants are extracted
+  hap1: "B"             # prefix for haplotype 1
+  hap2: "C"             # prefix for haplotype 2
+
+# FASTA file with rRNA sequences. 
+# obtained from:
+# https://rnacentral.org/export/results?job=31673b23-729f-4c7b-945b-a3fa0f846bad
+# Search: TAXONOMY:"10090" AND so_rna_type_name:"RRNA"
+rRNA: "data/external/rRNA/TAXONOMY10090_AND_so_rna_type_nameRRNA.fa"
+
+# extra custom parameters for each step of the pipeline
+params:
+  # Parameters for STAR indexing (--runMode genomeGenerate)
+  star-index: "--sjdbOverhang 96" # using 96 since I trim 4bp from every read and they are 101bp (see cutadapt below)
+
+  # specify your library strandedness here - the default assumes stranded library
+  # more information: https://salmon.readthedocs.io/en/latest/library_type.html#fraglibtype
+  salmon: "-l ISR"
+  
+  # Extra parameters for cutadapt step
+  # adapters based on https://cutadapt.readthedocs.io/en/stable/guide.html#illumina-truseq
+  # do not specify options related to output (`-o`, `-p`) or number of CPUs (`-j`)
+  cutadapt-se: "-a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA --quality-cutoff 20 --minimum-length 50"
+
+  # Trim with settings suitable for for Takara library. See Fig 2 in:
+  # https://www.takarabio.com/learning-centers/next-generation-sequencing/technical-notes/rna-seq/stranded-libraries-from-picogram-input-total-rna-(v2)
+  # -U 4 cuts the first 4 bases of read 2 (in theory only first 3 bases need trimming, but I remove 4 to be sure)
+  # -a N{4}ADAPTER trims the last 4 bases of every read 1 and any adapter in there as well
+  # Adapters based on: https://cutadapt.readthedocs.io/en/stable/guide.html#illumina-truseq
+  # More info here: https://cutadapt.readthedocs.io/en/stable/recipes.html#trim-a-fixed-number-of-bases-after-adapter-trimming
+  cutadapt-pe: "-a N{4}GATCGGAAGAGCACACGTCTGAACTCCAGTCA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT -U 4 --quality-cutoff 20 --minimum-length 50"

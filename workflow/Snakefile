@@ -1,0 +1,39 @@
+import glob
+import os
+import re
+import pandas as pd
+
+
+#---- Prepare sample information ----#
+
+# configuration file
+configfile: "workflow/config.yaml"
+
+# sequencing reads information
+sample_info = pd.read_csv(config["samples"], dtype = str).set_index(["sample"], drop = False)
+
+
+
+#---- Rule all ---- #
+
+rule all:
+  input:
+    # expand("results/salmon/{sample}/quant.sf", sample = sample_info.sample_name.unique()),
+    expand("results/salmon_diploid/{sample}", sample = sample_info["sample"].unique()),
+    "results/qc/multiqc_report.html",
+    # expand("results/markdup/{sample}.sortedByCoord.markdup.bam", sample = sample_info["sample"].unique()),
+    #expand("results/trimmed/{id}.{read}.fq.gz", id = sample_info["id"].unique(), read = ["R1", "R2"])
+    # "results/reference/diploidome/genome_diploid.fa.gz"
+
+
+#---- Pipeline Rules ----#
+
+include: "rules/_utils.smk"    # utility functions
+
+include: "rules/reference.smk" # prepare reference genome
+include: "rules/cutadapt.smk"  # trim reads
+include: "rules/salmon.smk"    # quantify using salmon
+include: "rules/star.smk"      # STAR alignment (only used for RSeQC metrics)
+include: "rules/sortmerna.smk" # sort rRNA reads
+include: "rules/qc.smk"        # FastQC, RSeQC and Multiqc
+
