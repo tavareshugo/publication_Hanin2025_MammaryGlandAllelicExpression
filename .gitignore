@@ -6,9 +6,11 @@
 !.gitignore
 !README.md
 !read_info.csv
+!mammary_cellsort_rnaseq.Rproj
 
 !workflow/
 !workflow/*
 !analysis/
 !analysis/*
 
+.Rproj.user
