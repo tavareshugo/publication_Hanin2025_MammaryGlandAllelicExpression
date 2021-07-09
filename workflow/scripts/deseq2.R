@@ -35,7 +35,8 @@ names(salmon_files) <- basename(dirname(salmon_files))
 
 # Prepare colData ---------------------------------------------------------
 
-samples <- vroom("read_info_test.csv")
+samples <- vroom("read_info.csv")
+#samples <- samples %>% filter(sample %in% names(salmon_files))
 samples <- samples %>%
   distinct(sample, cell_type, stage, timepoint, cross, animal_id)
 samples <- samples %>% column_to_rownames("sample")
@@ -54,6 +55,8 @@ txi_gene_allele <- tximport(salmon_files, type = "salmon",
                                                                 progress = FALSE,
                                                                 col_types = c("ciddd")))
 
+# design used is based on:
+# https://rstudio-pubs-static.s3.amazonaws.com/275642_e9d578fe1f7a404aad0553f52236c0a4.html
 dds_gene_allele <- DESeqDataSetFromTximport(txi_gene_allele,
                                             colData = samples,
                                             design = ~ 1)
