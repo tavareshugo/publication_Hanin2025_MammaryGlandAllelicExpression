@@ -8,11 +8,12 @@ rule salmon_diploid:
   output:
     directory("results/salmon_diploid/{sample}")
   params:
-    runtime = "02:00:00",
+    runtime = "04:00:00",
     extras = config["params"]["salmon"]
   log:
     "logs/salmon_diploid/{sample}.log"
   threads: 10
+  priority: 1
   conda:
     "../envs/rnaseq.yaml"
   shell:
@@ -38,7 +39,7 @@ rule salmon_regular:
   output:
     directory("results/salmon_regular/{sample}")
   params:
-    runtime = "02:00:00",
+    runtime = "04:00:00",
     extras = config["params"]["salmon"]
   log:
     "logs/salmon_regular/{sample}.log"

@@ -23,7 +23,8 @@ rule star:
     fq2 = get_trimmed_fq2
   output:
     bam = temp("results/star/{sample}/{sample}.Aligned.sortedByCoord.out.bam"),
-    bai = temp("results/star/{sample}/{sample}.Aligned.sortedByCoord.out.bam.bai")
+    bai = temp("results/star/{sample}/{sample}.Aligned.sortedByCoord.out.bam.bai"),
+    cts = "results/star/{sample}/{sample}.ReadsPerGene.out.tab"
   params:
     runtime = "03:00:00",
     rg = get_read_group,
@@ -65,7 +66,7 @@ rule markdup:
     runtime = "06:00:00"
   log:
     "logs/markdup/{sample}.log"
-  threads: 10
+  threads: 15
   conda:
     "../envs/rnaseq.yaml"
   shell:
