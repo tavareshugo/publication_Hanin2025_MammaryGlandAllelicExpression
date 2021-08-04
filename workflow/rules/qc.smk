@@ -18,10 +18,10 @@ rule fastqc:
     "results/qc/fastqc/{readfile}_fastqc.html",
     "results/qc/fastqc/{readfile}_fastqc.zip"
   params:
-    runtime = "00:30:00",
+    runtime = "01:30:00",
     outdir = "results/qc/fastqc/"
   threads: 4
-  priority: 1
+  #priority: 10
   log:
     "logs/fastqc/{readfile}.log"
   conda:
@@ -72,7 +72,7 @@ rule rseqc_gtf2bed:
 #     runtime = "06:00:00",
 #     bamdir = "results/markdup",
 #     prefix = "results/qc/rseqc/all_samples"
-#   priority: 1
+#   #priority: 10
 #   log:
 #     "logs/rseqc/geneBody_coverage.log"
 #   conda:
@@ -91,11 +91,11 @@ rule rseqc_gene_body_coverage:
   output:
     "results/qc/rseqc/{sample}.geneBodyCoverage.txt"
   params:
-    runtime = "06:00:00",
+    runtime = "12:00:00",
     bamdir = "results/markdup",
     prefix = "results/qc/rseqc/{sample}"
-  threads: 4  # for the HPC to make sure there's enough memory allocated
-  priority: 1
+  threads: 8  # for the HPC to make sure there's enough memory allocated
+  #priority: 10
   log:
     "logs/rseqc/geneBody_coverage/{sample}.log"
   conda:
@@ -115,13 +115,13 @@ rule rseqc_junction_annotation:
   output:
     "results/qc/rseqc/{sample}.junctionanno.junction.bed"
   params:
-    runtime = "01:00:00",
+    runtime = "06:00:00",
     extra=r"-q 255",  # STAR uses 255 as a score for unique mappers
     prefix="results/qc/rseqc/{sample}.junctionanno"
   log:
     "logs/rseqc/junction_annotation/{sample}.log"
-  threads: 4  # for the HPC to make sure there's enough memory allocated
-  priority: 1
+  threads: 8  # for the HPC to make sure there's enough memory allocated
+  #priority: 10
   conda:
     "../envs/rnaseq.yaml"
   shell:
@@ -137,11 +137,11 @@ rule rseqc_junction_saturation:
   output:
     "results/qc/rseqc/{sample}.junctionsat.junctionSaturation_plot.pdf",
   params:
-    runtime = "01:00:00",
+    runtime = "06:00:00",
     extra=r"-q 255",
     prefix="results/qc/rseqc/{sample}.junctionsat"
-  threads: 4  # for the HPC to make sure there's enough memory allocated
-  priority: 1
+  threads: 8  # for the HPC to make sure there's enough memory allocated
+  #priority: 10
   log:
     "logs/rseqc/junction_saturation/{sample}.log",
   conda:
@@ -158,9 +158,9 @@ rule rseqc_stat:
   output:
     "results/qc/rseqc/{sample}.stats.txt",
   params:
-    runtime = "01:00:00",
-  threads: 4  # for the HPC to make sure there's enough memory allocated
-  priority: 1
+    runtime = "07:00:00",
+  threads: 8  # for the HPC to make sure there's enough memory allocated
+  #priority: 10
   log:
     "logs/rseqc/bam_stat/{sample}.log",
   conda:
@@ -176,10 +176,10 @@ rule rseqc_infer:
     bed="results/qc/rseqc/annotation.bed",
   output:
     "results/qc/rseqc/{sample}.infer_experiment.txt",
-  priority: 1
+  #priority: 10
   params:
-    runtime = "01:00:00",
-  threads: 4  # for the HPC to make sure there's enough memory allocated
+    runtime = "06:00:00",
+  threads: 8  # for the HPC to make sure there's enough memory allocated
   log:
     "logs/rseqc/infer_experiment/{sample}.log",
   conda:
@@ -196,10 +196,10 @@ rule rseqc_innerdis:
   output:
     "results/qc/rseqc/{sample}.inner_distance_freq.inner_distance.txt",
   params:
-    runtime = "01:00:00",
+    runtime = "06:00:00",
     prefix="results/qc/rseqc/{sample}.inner_distance_freq"
-  threads: 4  # for the HPC to make sure there's enough memory allocated
-  priority: 1
+  threads: 8  # for the HPC to make sure there's enough memory allocated
+  #priority: 10
   log:
     "logs/rseqc/inner_distance/{sample}.log",
   conda:
@@ -216,9 +216,9 @@ rule rseqc_readdis:
   output:
     "results/qc/rseqc/{sample}.readdistribution.txt",
   params:
-    runtime = "01:00:00",
-  threads: 4  # for the HPC to make sure there's enough memory allocated
-  priority: 1
+    runtime = "06:00:00",
+  threads: 8  # for the HPC to make sure there's enough memory allocated
+  #priority: 10
   log:
     "logs/rseqc/read_distribution/{sample}.log",
   conda:
@@ -234,10 +234,10 @@ rule rseqc_readdup:
   output:
     "results/qc/rseqc/{sample}.readdup.DupRate_plot.pdf",
   params:
-    runtime = "01:00:00",
+    runtime = "06:00:00",
     prefix="results/qc/rseqc/{sample}.readdup"
-  threads: 4  # for the HPC to make sure there's enough memory allocated
-  priority: 1
+  threads: 8  # for the HPC to make sure there's enough memory allocated
+  #priority: 10
   log:
     "logs/rseqc/read_duplication/{sample}.log",
   conda:
@@ -253,10 +253,10 @@ rule rseqc_readgc:
   output:
     "results/qc/rseqc/{sample}.readgc.GC_plot.pdf",
   params:
-    runtime = "01:00:00",
+    runtime = "06:00:00",
     prefix="results/qc/rseqc/{sample}.readgc"
-  threads: 4  # for the HPC to make sure there's enough memory allocated
-  priority: 1
+  threads: 8  # for the HPC to make sure there's enough memory allocated
+  #priority: 10
   log:
     "logs/rseqc/read_GC/{sample}.log",
   conda:
@@ -333,8 +333,9 @@ rule multiqc:
   output:
     "results/qc/multiqc_report.html",
   params:
-    runtime = "01:00:00",
+    runtime = "06:00:00",
     qcdirs = ["results/qc/fastqc", "logs/cutadapt/", "results/salmon_diploid/", "results/sortmerna/", "results/markdup/", "results/qc/rseqc/"]
+  threads: 8
   conda:
     "../envs/rnaseq.yaml"
   log:
