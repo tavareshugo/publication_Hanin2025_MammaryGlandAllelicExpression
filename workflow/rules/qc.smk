@@ -91,7 +91,7 @@ rule rseqc_gene_body_coverage:
   output:
     "results/qc/rseqc/{sample}.geneBodyCoverage.txt"
   params:
-    runtime = "12:00:00",
+    runtime = "20:00:00",
     bamdir = "results/markdup",
     prefix = "results/qc/rseqc/{sample}"
   threads: 8  # for the HPC to make sure there's enough memory allocated

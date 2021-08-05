@@ -16,7 +16,6 @@ source activate rnaseq
 
 #### Input Variables ####
 
-RELEASE="102" # ENSEMBL genome release number (last release with GRCm38)
 CPUS="$SLURM_CPUS_PER_TASK"    # number of CPUs to use
 OUTDIR="data/external/reference/"  # output directory name
 
@@ -37,13 +36,10 @@ cd "$OUTDIR"
 
 # Genome 
 wget -O genome.fa.gz http://ftp.ensembl.org/pub/release-102/fasta/mus_musculus/dna/Mus_musculus.GRCm38.dna_sm.primary_assembly.fa.gz
-# wget -O genome.fa.gz ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M25/GRCm38.primary_assembly.genome.fa.gz
 
 # GFF3/GTF
 wget -O annotation.gtf.gz ftp://ftp.ensembl.org/pub/release-102/gtf/mus_musculus/Mus_musculus.GRCm38.102.gtf.gz
 wget -O annotation.gff3.gz ftp://ftp.ensembl.org/pub/release-102/gff3/mus_musculus/Mus_musculus.GRCm38.102.gff3.gz
-#wget -O annotation.gtf.gz ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M25/gencode.vM25.primary_assembly.annotation.gtf.gz
-#wget -O annotation.gff3.gz ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M25/gencode.vM25.primary_assembly.annotation.gff3.gz
 
 # Extract transcript sequences from genome
 # the reason we extract them ourselves is that ENSEMBL includes transcripts in assembly patches and excludes TECs (to be experimentally confirmed)
