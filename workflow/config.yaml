@@ -6,7 +6,7 @@
 # fq1          (path to read 1 FastQ file - can be compressed)
 # fq2          (path to read 2 FastQ file - can be compressed)
 # strandedness (values allowed: 'none', 'yes', 'reverse'; if empty will assume 'none')
-samples: read_info_batch09.csv # read_info_test.csv
+samples: read_info.csv # read_info_test.csv
 # Note about strandedness:
 # 'none' is for unstranded protocols
 # 'yes' and 'reverse' follow the nomenclature used in `htseq-count --reverse` 
