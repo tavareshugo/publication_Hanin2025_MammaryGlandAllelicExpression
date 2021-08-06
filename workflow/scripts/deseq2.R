@@ -65,13 +65,13 @@ samples <- samples[names(salmon_files), ]
 # Prepare rowData ---------------------------------------------------------
 
 # get gene annotation - this was mapped to GRCm38 assembly
-mart <- useEnsembl(biomart = "genes", dataset = "mmusculus_gene_ensembl",
+mart <- useEnsembl(biomart = "ENSEMBL_MART_ENSEMBL", dataset = "mmusculus_gene_ensembl",
                    host="nov2020.archive.ensembl.org")
 
 # gene information
 gene_annot <- getBM(attributes = c("ensembl_gene_id",
-                                   # "chromosome_name","strand",
-                                   # "start_position", "end_position",
+                                   "chromosome_name",#"strand",
+                                   "start_position", "end_position",
                                    "external_gene_name",
                                    "percentage_gene_gc_content",
                                    "gene_biotype"),
@@ -289,6 +289,7 @@ dds_isoform_allele <- DESeqDataSetFromTximport(txi_isoform_allele,
                                                colData = samples,
                                                design = ~ 1)
 
+
 # prepare allele-specific dds object
 # separate into two sets
 dds_isoform_allele_b <- dds_isoform_allele[grep("B\\.", rownames(dds_isoform_allele)), ]
@@ -338,6 +339,17 @@ txi_isoform_regular <- tximport(salmon_files, type = "salmon",
 dds_isoform_regular <- DESeqDataSetFromTximport(txi_isoform_regular,
                                              colData = samples,
                                              design = ~ 1)
+
+
+# add rowData
+rowData(dds_isoform_regular) <- DataFrame(transcript_rowdata[rownames(dds_isoform_regular), ])
+
+# normalised counts
+assay(dds_isoform_regular, "vst_blind") <- varianceStabilizingTransformation(counts(dds_isoform_regular),
+                                                                          blind = TRUE)
+
+assay(dds_isoform_regular, "rlog_blind") <- rlog(counts(dds_isoform_regular),
+                                              blind = TRUE)
 
 # save object
 saveRDS(dds_isoform_regular,
