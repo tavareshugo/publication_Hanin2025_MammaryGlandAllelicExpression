@@ -21,6 +21,10 @@ rule all:
     # expand("results/salmon/{sample}/quant.sf", sample = sample_info.sample_name.unique()),
     expand("results/salmon_diploid/{sample}", sample = sample_info["sample"].unique()),
     "results/qc/multiqc_report.html",
+    "results/DESeqDataSet/dds_gene_allele.rds",
+    "results/DESeqDataSet/dds_gene_regular.rds",
+    "results/DESeqDataSet/dds_isoform_allele.rds",
+    "results/DESeqDataSet/dds_isoform_regular.rds"
     # expand("results/markdup/{sample}.sortedByCoord.markdup.bam", sample = sample_info["sample"].unique()),
     #expand("results/trimmed/{id}.{read}.fq.gz", id = sample_info["id"].unique(), read = ["R1", "R2"])
     # "results/reference/diploidome/genome_diploid.fa.gz"
@@ -36,4 +40,5 @@ include: "rules/salmon.smk"    # quantify using salmon
 include: "rules/star.smk"      # STAR alignment (only used for RSeQC metrics)
 include: "rules/sortmerna.smk" # sort rRNA reads
 include: "rules/qc.smk"        # FastQC, RSeQC and Multiqc
+include: "rules/deseq2.smk"    # create DESeqDataSet objects
 

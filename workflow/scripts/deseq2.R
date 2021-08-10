@@ -1,3 +1,5 @@
+packages <- c("valr", "DESeq2", "biomaRt", "tximport", "vroom", "dplyr", "tibble")
+install.packages(setdiff(packages, rownames(installed.packages())), repos = "https://cran.ma.imperial.ac.uk/")
 library(valr)
 library(DESeq2)
 library(biomaRt)
@@ -6,6 +8,9 @@ library(vroom)
 library(dplyr)
 #library(tidyr)
 library(tibble)
+
+# create output directory 
+if (!dir.exists("results/DESeqDataSet/")) dir.create("results/DESeqDataSet/", recursive = TRUE)
 
 
 # Prepare tx2gene tables --------------------------------------------------
@@ -234,7 +239,7 @@ rowData(dds_gene_allele) <- DataFrame(gene_annot[rownames(dds_gene_allele), ])
 
 # save object
 saveRDS(dds_gene_allele,
-        "data/processed/dds_gene_allele.rds")
+        "results/DESeqDataSet/dds_gene_allele.rds")
 
 # clean environment
 rm(dds_gene_allele, txi_gene_allele)
@@ -261,12 +266,12 @@ rowData(dds_gene_regular) <- DataFrame(gene_annot[rownames(dds_gene_regular), ])
 assay(dds_gene_regular, "vst_blind") <- varianceStabilizingTransformation(counts(dds_gene_regular),
                                                                           blind = TRUE)
 
-assay(dds_gene_regular, "rlog_blind") <- rlog(counts(dds_gene_regular),
-                                              blind = TRUE)
+# assay(dds_gene_regular, "rlog_blind") <- rlog(counts(dds_gene_regular),
+#                                               blind = TRUE)
 
 # save object
 saveRDS(dds_gene_regular,
-        "data/processed/dds_gene_regular.rds")
+        "results/DESeqDataSet/dds_gene_regular.rds")
 
 # clean environment
 rm(txi_gene_regular, dds_gene_regular)
@@ -319,7 +324,7 @@ rowData(dds_isoform_allele) <- DataFrame(transcript_rowdata[rownames(dds_isoform
 
 # save object
 saveRDS(dds_isoform_allele,
-        "data/processed/dds_isoform_allele.rds")
+        "results/DESeqDataSet/dds_isoform_allele.rds")
 
 # clean environment
 rm(txi_isoform_allele, dds_isoform_allele)
@@ -348,10 +353,10 @@ rowData(dds_isoform_regular) <- DataFrame(transcript_rowdata[rownames(dds_isofor
 assay(dds_isoform_regular, "vst_blind") <- varianceStabilizingTransformation(counts(dds_isoform_regular),
                                                                           blind = TRUE)
 
-assay(dds_isoform_regular, "rlog_blind") <- rlog(counts(dds_isoform_regular),
-                                              blind = TRUE)
+# assay(dds_isoform_regular, "rlog_blind") <- rlog(counts(dds_isoform_regular),
+#                                                  blind = TRUE)
 
 # save object
 saveRDS(dds_isoform_regular,
-        "data/processed/dds_isoform_regular.rds")
+        "results/DESeqDataSet/dds_isoform_regular.rds")
 
