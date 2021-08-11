@@ -33,6 +33,7 @@ dds$allele_parent <- factor(dds$allele_parent)
 # ~ 0 + cell_type:animal_id + condition:allele_parent
 design <- model.matrix(~ 0 + animal_id + condition:allele_parent, colData(dds))
 design <- model.matrix(~ 0 + animal_id + cell_type + condition:allele_parent, colData(dds))
+design <- model.matrix(~ 0 + timepoint + cell_type + cell_type:timepoint:allele_parent, colData(dds))
 design <- design[, !grepl("allele_parentpaternal", colnames(design))] # to make it full rank
 design(dds) <- design
 

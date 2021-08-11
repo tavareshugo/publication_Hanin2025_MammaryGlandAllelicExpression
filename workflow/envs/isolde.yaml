@@ -1,0 +1,6 @@
+name: rnaseq
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  -  bioconductor-isolde=1.20.0

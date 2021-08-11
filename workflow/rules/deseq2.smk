@@ -1,7 +1,7 @@
 rule DESeqDataSet:
   input:
     expand(
-      "results/salmon_diploid/{sample}", 
+      "results/salmon_diploid/{sample}",
       sample = sample_info["sample"].unique()
     )
   output:
@@ -18,3 +18,35 @@ rule DESeqDataSet:
     "../envs/deseq2.yaml"
   shell:
     "Rscript workflow/scripts/deseq2.R > {log} 2>&1"
+
+
+rule ase_deseq2:
+  input:
+    "results/DESeqDataSet/dds_gene_allele.rds"
+  output:
+    "results/ase_deseq2/dds_ase.rds"
+  params:
+    runtime = "36:00:00",
+  threads: 10
+  log:
+    "logs/deseq2/ase_deseq2.log"
+  conda:
+    "../envs/deseq2.yaml"
+  shell:
+    "Rscript workflow/scripts/ase_deseq.R > {log} 2>&1"
+
+
+rule ase_isolde:
+  input:
+    "results/DESeqDataSet/dds_gene_allele.rds"
+  output:
+    "results/ase_isolde/isolde_all.csv"
+  params:
+    runtime = "12:00:00",
+  threads: 10
+  log:
+    "logs/isolde/ase_isolde.log"
+  conda:
+    "../envs/isolde.yaml"
+  shell:
+    "Rscript workflow/scripts/ase_isolde.R > {log} 2>&1"
