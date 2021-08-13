@@ -3,4 +3,5 @@ channels:
   - bioconda
   - conda-forge
 dependencies:
-  -  bioconductor-isolde=1.20.0
+  - bioconductor-isolde=1.20.0
+  - bioconductor-deseq2=1.32.0

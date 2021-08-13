@@ -46,5 +46,5 @@ dds <- DESeq(dds)
 
 
 # save object for later exploration
-saveRDS(dds, "results/ASE_DEseq/dds_ase_test.rds")
+saveRDS(dds, "results/ase_deseq2/dds_ase.rds")
 
