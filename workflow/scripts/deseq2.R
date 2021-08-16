@@ -9,7 +9,7 @@ library(dplyr)
 #library(tidyr)
 library(tibble)
 
-# create output directory 
+# create output directory
 if (!dir.exists("results/DESeqDataSet/")) dir.create("results/DESeqDataSet/", recursive = TRUE)
 
 
@@ -180,12 +180,12 @@ transcript_annot <- transcript_annot %>%
 
 # create a data.frame to add as rowData
 transcript_rowdata <- transcript_annot %>%
-  group_by(ensembl_transcript_id, ensembl_gene_id, chromosome_name, strand, transcript_biotype) %>%
+  group_by(ensembl_transcript_id, ensembl_gene_id, chromosome_name, transcript_biotype) %>%
   summarise(n_indels = sum(n_indels, na.rm = TRUE),
             n_snps = sum(n_snps, na.rm = TRUE),
             n_variants = sum(n_variants, na.rm = TRUE),
-            start = min(exon_chrom_start),
-            end = max(exon_chrom_end)) %>%
+            start_position = min(exon_chrom_start),
+            end_position = max(exon_chrom_end)) %>%
   ungroup() %>%
   column_to_rownames("ensembl_transcript_id")
 
@@ -262,12 +262,16 @@ dds_gene_regular <- DESeqDataSetFromTximport(txi_gene_regular,
 # add rowData
 rowData(dds_gene_regular) <- DataFrame(gene_annot[rownames(dds_gene_regular), ])
 
-# normalised counts
-assay(dds_gene_regular, "vst_blind") <- varianceStabilizingTransformation(counts(dds_gene_regular),
-                                                                          blind = TRUE)
+# add size factors
+dds_gene_regular <- estimateSizeFactors(dds_gene_regular)
 
-# assay(dds_gene_regular, "rlog_blind") <- rlog(counts(dds_gene_regular),
-#                                               blind = TRUE)
+# normalised counts
+assay(dds_gene_regular, "logcounts") <- log2(
+  counts(dds_gene_regular, normalized = TRUE) + 1
+  )
+assay(dds_gene_regular, "vst") <- assay(
+  varianceStabilizingTransformation(dds_gene_regular)
+  )
 
 # save object
 saveRDS(dds_gene_regular,
@@ -349,12 +353,17 @@ dds_isoform_regular <- DESeqDataSetFromTximport(txi_isoform_regular,
 # add rowData
 rowData(dds_isoform_regular) <- DataFrame(transcript_rowdata[rownames(dds_isoform_regular), ])
 
-# normalised counts
-assay(dds_isoform_regular, "vst_blind") <- varianceStabilizingTransformation(counts(dds_isoform_regular),
-                                                                          blind = TRUE)
+# add size factors
+dds_isoform_regular <- estimateSizeFactors(dds_isoform_regular)
 
-# assay(dds_isoform_regular, "rlog_blind") <- rlog(counts(dds_isoform_regular),
-#                                                  blind = TRUE)
+# normalised counts
+assay(dds_isoform_regular, "logcounts") <- log2(
+  counts(dds_isoform_regular, normalized = TRUE) + 1
+  )
+assay(dds_isoform_regular, "vst") <- assay(
+  varianceStabilizingTransformation(dds_isoform_regular)
+  )
+
 
 # save object
 saveRDS(dds_isoform_regular,
