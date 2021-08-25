@@ -56,10 +56,11 @@ rule diffexp:
   input:
     "results/DESeqDataSet/dds_gene_regular.rds"
   output:
-    "results/diffexp/lfc.csv",
+    "results/diffexp/lfc_timepoints.csv",
+    "results/diffexp/lfc_cells.csv",
     "results/diffexp/dds.rds"
   params:
-    runtime = "12:00:00"
+    runtime = "36:00:00"
   threads: 10
   log:
     "logs/deseq2/diffexp.log"
