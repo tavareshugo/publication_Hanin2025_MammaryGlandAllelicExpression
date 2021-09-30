@@ -10,6 +10,9 @@ library(DESeq2)
 # DDS object with gene-level quantification
 dds <- readRDS("results/DESeqDataSet/dds_gene_regular.rds")
 
+# filtering out lowly-expressed genes and one sample with very few reads
+dds <- dds[rowSums(counts(dds) >= 1) > 80, colSums(counts(dds)) > 1e6]
+
 
 # Fit model ------------------------------------------------------------
 
@@ -24,20 +27,25 @@ saveRDS(dds, "results/diffexp/dds.rds")
 
 # Run DE test between timepoints ---------------------------------------
 
-# obtain table of results with LFC across consecutive timepoints per cell
-lfc <- vector("list", nlevels(dds$cell_type)*9)
+# obtain table of results with LFC between timepoints per cell
+contrast_combinations <- combn(unique(as.character(dds$timepoint)), 2)
+lfc <- vector("list", nlevels(dds$cell_type)*ncol(contrast_combinations))
 mod_mat <- model.matrix(design(dds), colData(dds))
 i <- 1
 for (cell in levels(dds$cell_type)){
-  for (t in 1:9){
+  for (contrast in 1:ncol(contrast_combinations)){
+    # timepoints being compared
+    t1 <- contrast_combinations[, contrast][1]
+    t2 <- contrast_combinations[, contrast][2]
+
     # coefficient weights for each timepoint
-    t2_coef <- colMeans(mod_mat[dds$cell_type == cell & dds$timepoint == paste0("t", t), ])
-    t1_coef <- colMeans(mod_mat[dds$cell_type == cell & dds$timepoint == paste0("t", t-1), ])
+    t1_coef <- colMeans(mod_mat[dds$cell_type == cell & dds$timepoint == t1, ])
+    t2_coef <- colMeans(mod_mat[dds$cell_type == cell & dds$timepoint == t2, ])
 
     # results table (with log2FC shrinkage)
     res <- lfcShrink(dds, type = "ashr", contrast = t2_coef - t1_coef)
     res["cell"] <- cell
-    res["contrast"] <- paste0("t", t, "_", "t", t-1)
+    res["contrast"] <- paste0(t2, "_", t1)
 
     # add to results list
     lfc[[i]] <- res
@@ -46,7 +54,8 @@ for (cell in levels(dds$cell_type)){
     i <- i + 1
   }
 }
-rm(mod_mat, i, cell, t, t2_coef, t1_coef, res) # clean environment
+# clean environment
+rm(contrast_combinations, mod_mat, i, cell, contrast, t2, t1, t2_coef, t1_coef, res)
 
 lfc <- do.call("rbind", lfc)
 lfc$gene <- rownames(lfc)
@@ -58,7 +67,7 @@ write.csv(lfc, "results/diffexp/lfc_timepoints.csv", row.names = FALSE)
 
 # obtain table of results with LFC between cells within each timepoint
 contrast_combinations <- combn(unique(as.character(dds$cell_type)), 2)
-lfc <- vector("list", nlevels(dds$cell_type)*9)
+lfc <- vector("list", nlevels(dds$timepoint)*ncol(contrast_combinations))
 mod_mat <- model.matrix(design(dds), colData(dds))
 i <- 1
 for (t in levels(dds$timepoint)){
@@ -83,7 +92,8 @@ for (t in levels(dds$timepoint)){
     i <- i + 1
   }
 }
-rm(mod_mat, i, t, cell2_coef, cell1_coef, res, cell2, cell1) # clean environment
+# clean environment
+rm(contrast_combinations, mod_mat, i, t, contrast, cell2_coef, cell1_coef, res, cell2, cell1)
 
 lfc <- do.call("rbind", lfc)
 lfc$gene <- rownames(lfc)

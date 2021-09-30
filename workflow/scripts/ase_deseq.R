@@ -7,6 +7,9 @@ library(tidyverse)
 # DDS object with allele-specific counts at the gene level
 dds <- readRDS("results/DESeqDataSet/dds_gene_allele.rds")
 
+# filtering out lowly-expressed genes and one sample with very few reads
+dds <- dds[rowSums(counts(dds) >= 1) > 80, colSums(counts(dds)) > 1e6]
+
 
 # Prepare Data ------------------------------------------------------------
 
