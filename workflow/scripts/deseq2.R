@@ -86,9 +86,10 @@ gene_annot <- getBM(attributes = c("ensembl_gene_id",
 transcript_annot <- getBM(attributes = c("ensembl_gene_id",
                                          "ensembl_transcript_id",
                                          "ensembl_exon_id",
-                                         "exon_chrom_start",
-                                         "exon_chrom_end",
                                          "chromosome_name",
+                                         "exon_chrom_start",
+                                         "exon_chrom_end",                                         
+                                         "external_gene_name",
                                          "strand",
                                          "transcript_biotype"),
                           mart = mart)
@@ -180,13 +181,14 @@ transcript_annot <- transcript_annot %>%
 
 # create a data.frame to add as rowData
 transcript_rowdata <- transcript_annot %>%
-  group_by(ensembl_transcript_id, ensembl_gene_id, chromosome_name, transcript_biotype) %>%
+  group_by(ensembl_transcript_id, ensembl_gene_id, chromosome_name, transcript_biotype, external_gene_name) %>%
   summarise(n_indels = sum(n_indels, na.rm = TRUE),
             n_snps = sum(n_snps, na.rm = TRUE),
             n_variants = sum(n_variants, na.rm = TRUE),
             start_position = min(exon_chrom_start),
             end_position = max(exon_chrom_end)) %>%
   ungroup() %>%
+  rename(gene = ensembl_gene_id) %>%
   column_to_rownames("ensembl_transcript_id")
 
 # clean environment
