@@ -274,6 +274,7 @@ assay(dds_gene_regular, "logcounts") <- log2(
 assay(dds_gene_regular, "vst") <- assay(
   varianceStabilizingTransformation(dds_gene_regular)
   )
+assay(dds_gene_regular, "tpm") <- txi_gene_regular$abundance # TPM from Salmon
 
 # save object
 saveRDS(dds_gene_regular,
